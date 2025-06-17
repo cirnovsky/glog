@@ -266,4 +266,45 @@ export async function getLabels(): Promise<Label[]> {
     }
     throw new Error('Failed to fetch labels');
   }
+}
+
+const DELETE_DISCUSSION_MUTATION = `
+  mutation DeleteDiscussion($discussionId: ID!) {
+    deleteDiscussion(input: { id: $discussionId }) {
+      discussion {
+        id
+      }
+    }
+  }
+`;
+
+export async function deleteDiscussion(discussionId: string): Promise<void> {
+  try {
+    validateEnv();
+
+    await request(
+      GITHUB_API_URL,
+      DELETE_DISCUSSION_MUTATION,
+      {
+        discussionId,
+      },
+      {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      }
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes('401')) {
+        throw new Error('GitHub authentication failed. Please check your token.');
+      }
+      if (error.message.includes('404')) {
+        throw new Error(`Discussion not found: ${discussionId}`);
+      }
+      if (error.message.includes('403')) {
+        throw new Error('Access denied. Please check your token permissions.');
+      }
+      throw new Error(`Failed to delete discussion: ${error.message}`);
+    }
+    throw new Error('Failed to delete discussion');
+  }
 } 

@@ -10,6 +10,14 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  font-family: Palatino, 'Palatino Linotype', 'Palatino LT STD', 'Latin Modern Roman', 'Source Han Serif CN', serif;
+}
+
+body {
+  font-family: 'Source Han Serif CN', serif !important;
+}
+blockquote {
+  font-family: 'Kai SC', 'Kai TC', serif !important;
 }
 
 .error-container {
@@ -39,4 +47,84 @@ body {
 
 .error-container li {
   margin-bottom: 0.5rem;
-} 
+}
+
+img {
+  display: block;
+  width: 80%;
+  margin: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.markdown-body {
+  max-width: 640px;
+  margin: 2.5rem auto;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  font-family: 'georgia', 'times new roman', times, serif;
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+
+.ui.segment {
+  max-width: 640px;
+  margin: 2.5rem auto;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  /* text-align: center; */
+}
+
+@font-face {
+  font-family: 'source han serif cn';
+  src: local('source han serif cn'), local('source han serif sc'),
+       local('source han serif tc'), local('source han serif tw'),
+       local('source han serif'), local('noto serif cjk sc'), local('songti sc'), local('simsong'),
+       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/sourcehanserifcn-regular-yihui.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'kai sc';
+  src: local('kaiti'), local('kaiti sc'), local('stkaiti'), local('楷体'), local('simkai'), local('ar pl kaitiM GB'), local('DFKai-SB'), local('FandolKai'),
+       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/gkai00mp-yihui.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Kai TC';
+  src: url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/bkai00mp-yihui.woff2') format('woff2');
+}
+
+.home blockquote, .cn blockquote, .kai, .cn em, .cn .side, .hash-note, .hide-notes .toggle-notes {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Kai SC', 'Kai TC', serif;
+}
+code {
+  font-family: Consolas, Courier, 'Lucida Console', 'Courier New', 'Kai SC', 'Kai TC', monospace;
+}
+pre, code {
+  font-size: .95em;
+}
+.cn em, .cn .title {
+  font-style: normal;
+}
+blockquote {
+  font-family: 'Kai SC', 'Kai TC', serif;
+}
+
+/* Reduce the search bar button and fields size */
+.ui.form .fields > .field .ui.button {
+  font-size: 1em;
+  padding: 0.6em 1.2em;
+}
+.ui.form .fields > .field .ui.input > input,
+.ui.form .fields > .field .ui.dropdown {
+  font-size: 1em;
+  min-height: 2em;
+}

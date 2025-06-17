@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ts": "node --loader ts-node/esm scripts/get-repo-id.ts"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",
@@ -18,9 +19,11 @@
     "date-fns": "^3.3.1",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
+    "katex": "^0.16.22",
     "marked": "^15.0.12",
     "next": "^14.2.30",
     "postcss": "^8.4.35",
+    "prismjs": "^1.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "semantic-ui-css": "^2.5.0",
@@ -29,11 +32,14 @@
     "turndown": "^7.2.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
+    "dotenv": "^16.5.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }

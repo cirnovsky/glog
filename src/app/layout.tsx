@@ -1,5 +1,9 @@
 import './globals.css';
 import 'semantic-ui-css/semantic.min.css';
+import 'prismjs/themes/prism.css';
+import 'katex/dist/katex.min.css';
+import 'prismjs/plugins/toolbar/prism-toolbar.css';
+// import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.css';
 import type { Metadata } from 'next';
 import Navbar from './components/Navbar';
 

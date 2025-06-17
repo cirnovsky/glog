@@ -1,6 +1,7 @@
 import { getDiscussions, getCategories, getLabels } from '@/lib/github';
 import PostCard from '../components/PostCard';
 import { Discussion } from '@/types/github';
+import SearchBar from '../components/SearchBar';
 
 interface PostsPageProps {
   searchParams: {
@@ -9,6 +10,22 @@ interface PostsPageProps {
     tag?: string;
     search?: string;
   };
+}
+
+interface Discussion {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  frontmatter?: {
+    date?: string;
+  };
+  slug: string;
+  category: Category;
+  labels: {
+    nodes: Tag[];
+  };
+  date?: string;
 }
 
 export default async function PostsPage({ searchParams }: PostsPageProps) {
@@ -29,7 +46,10 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
       throw new Error('Repository not found');
     }
 
-    const posts = discussionsResponse.repository.discussions.nodes;
+    const posts = discussionsResponse.repository.discussions.nodes.map((post: Discussion) => ({
+      ...post,
+      date: post.frontmatter?.date || post.createdAt,
+    }));
     const totalCount = discussionsResponse.repository.discussions.totalCount;
     const totalPages = Math.ceil(totalCount / perPage);
 
@@ -42,6 +62,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
     return (
       <div className="ui container">
         <h1>All Posts</h1>
+        <SearchBar categories={categories} labels={labels} />
         <div className="ui segment">
           {posts.length === 0 ? (
             <p>No posts found</p>
@@ -52,7 +73,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                   key={post.id}
                   title={post.title}
                   excerpt={post.body}
-                  date={post.createdAt}
+                  date={post.date}
                   slug={post.slug}
                   category={post.category}
                   tags={post.labels.nodes}
