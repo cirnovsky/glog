@@ -40,13 +40,11 @@ const DISCUSSION_QUERY = `
     $owner: String!
     $name: String!
     $first: Int!
-    $after: String
     $categoryId: ID
   ) {
     repository(owner: $owner, name: $name) {
       discussions(
         first: $first
-        after: $after
         categoryId: $categoryId
         orderBy: { field: CREATED_AT, direction: DESC }
       ) {
@@ -76,10 +74,6 @@ const DISCUSSION_QUERY = `
           comments {
             totalCount
           }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
         }
         totalCount
       }
@@ -111,7 +105,6 @@ export async function getDiscussions(params: SearchParams = {}): Promise<Discuss
       owner: REPO_OWNER,
       name: REPO_NAME,
       first: params.first || 10,
-      after: params.after,
       categoryId: params.category,
     };
 

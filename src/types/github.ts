@@ -36,6 +36,7 @@ export interface Discussion {
     tags?: string[];
     [key: string]: any;
   };
+  date?: string;
 }
 
 export interface DiscussionsResponse {
@@ -53,7 +54,6 @@ export interface DiscussionsResponse {
 
 export interface SearchParams {
   first?: number;
-  after?: string;
   category?: string;
   tag?: string;
   search?: string;

@@ -1,6 +1,6 @@
 import { getDiscussions, getCategories, getLabels } from '@/lib/github';
 import PostCard from '../components/PostCard';
-import { Discussion } from '@/types/github';
+import { Discussion, Category, Label } from '@/types/github';
 import SearchBar from '../components/SearchBar';
 
 interface PostsPageProps {
@@ -12,31 +12,30 @@ interface PostsPageProps {
   };
 }
 
-interface Discussion {
-  id: string;
-  title: string;
-  body: string;
-  createdAt: string;
-  frontmatter?: {
-    date?: string;
-  };
-  slug: string;
-  category: Category;
-  labels: {
-    nodes: Tag[];
-  };
-  date?: string;
-}
+// interface Discussion_old {
+//   id: string;
+//   title: string;
+//   body: string;
+//   createdAt: string;
+//   frontmatter?: {
+//     date?: string;
+//   };
+//   slug: string;
+//   category: Category;
+//   labels: {
+//     nodes: Tag[];
+//   };
+//   date?: string;
+// }
 
 export default async function PostsPage({ searchParams }: PostsPageProps) {
   try {
     const page = parseInt(searchParams.page || '1');
     const perPage = 10;
 
-    // First, try to get just the discussions
+    // Fetch all discussions (GitHub GraphQL doesn't support offset pagination well)
     const discussionsResponse = await getDiscussions({
-      first: perPage,
-      after: page > 1 ? btoa(`cursor:${(page - 1) * perPage}`) : undefined,
+      first: 100, // Fetch a reasonable number of discussions
       category: searchParams.category,
       tag: searchParams.tag,
       search: searchParams.search,
@@ -46,11 +45,17 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
       throw new Error('Repository not found');
     }
 
-    const posts = discussionsResponse.repository.discussions.nodes.map((post: Discussion) => ({
+    const allPosts = discussionsResponse.repository.discussions.nodes.map((post: Discussion) => ({
       ...post,
-      date: post.frontmatter?.date || post.createdAt,
-    }));
-    const totalCount = discussionsResponse.repository.discussions.totalCount;
+      date: post.frontmatter?.date || post.createdAt || new Date().toISOString(),
+    })) as (Discussion & { date: string })[];
+
+    // Apply client-side pagination
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
+    const posts = allPosts.slice(startIndex, endIndex);
+    
+    const totalCount = allPosts.length;
     const totalPages = Math.ceil(totalCount / perPage);
 
     // If discussions work, try to get categories and labels
@@ -68,7 +73,7 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
             <p>No posts found</p>
           ) : (
             <>
-              {posts.map((post: Discussion) => (
+              {posts.map((post: Discussion & { date: string }) => (
                 <PostCard
                   key={post.id}
                   title={post.title}
@@ -83,6 +88,11 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
               {totalPages > 1 && (
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                   <div className="ui pagination menu">
+                    {page > 1 && (
+                      <a className="item" href={`/posts?page=${page - 1}`}>
+                        Previous
+                      </a>
+                    )}
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                       <a
                         key={pageNum}
@@ -92,6 +102,11 @@ export default async function PostsPage({ searchParams }: PostsPageProps) {
                         {pageNum}
                       </a>
                     ))}
+                    {page < totalPages && (
+                      <a className="item" href={`/posts?page=${page + 1}`}>
+                        Next
+                      </a>
+                    )}
                   </div>
                 </div>
               )}
