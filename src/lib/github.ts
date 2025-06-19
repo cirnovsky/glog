@@ -1,6 +1,6 @@
 import { request } from 'graphql-request';
 import { DiscussionsResponse, SearchParams, Category, Label } from '@/types/github';
-import { parseFrontmatter } from './frontmatter';
+import { parseFrontmatter, stripFrontmatterFromHtml } from './frontmatter';
 
 const GITHUB_API_URL = 'https://api.github.com/graphql';
 const REPO_OWNER = process.env.GITHUB_REPO_OWNER || '';
@@ -468,4 +468,194 @@ const DISCUSSION_QUERY_WITH_CURSORS = `
       }
     }
   }
-`; 
+`;
+
+// Helper to flatten comments and replies (1 level deep)
+function flattenCommentsWithReplies(topLevel: any[], repliesMap: Record<string, any[]>): any[] {
+  let flat: any[] = [];
+  for (const node of topLevel) {
+    flat.push({ ...node, replyTo: node.replyTo && node.replyTo.id ? { id: node.replyTo.id } : null });
+    const replies = repliesMap[node.id] || [];
+    for (const reply of replies) {
+      flat.push({ ...reply, replyTo: reply.replyTo && reply.replyTo.id ? { id: reply.replyTo.id } : { id: node.id } });
+    }
+  }
+  return flat;
+}
+
+export async function getDiscussionComments(discussionId: string) {
+  try {
+    validateEnv();
+
+    const COMMENTS_QUERY = `
+      query GetDiscussionComments($discussionId: ID!) {
+        node(id: $discussionId) {
+          ... on Discussion {
+            comments(first: 100) {
+              nodes {
+                id
+                body
+                bodyHTML
+                createdAt
+                author {
+                  login
+                  avatarUrl
+                }
+                userContentEdits {
+                  totalCount
+                }
+                isMinimized
+                minimizedReason
+                replyTo {
+                  id
+                }
+              }
+              totalCount
+            }
+          }
+        }
+      }
+    `;
+
+    const REPLIES_QUERY = `
+      query GetReplies($commentId: ID!) {
+        node(id: $commentId) {
+          ... on DiscussionComment {
+            replies(first: 100) {
+              nodes {
+                id
+                body
+                bodyHTML
+                createdAt
+                author {
+                  login
+                  avatarUrl
+                }
+                userContentEdits {
+                  totalCount
+                }
+                isMinimized
+                minimizedReason
+                replyTo {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response: any = await request(
+      GITHUB_API_URL,
+      COMMENTS_QUERY,
+      { discussionId },
+      {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      }
+    );
+
+    if (!response.node) {
+      throw new Error('Discussion not found');
+    }
+
+    const topLevelComments = response.node.comments.nodes || [];
+
+    // Fetch replies for each top-level comment in parallel
+    const repliesMap: Record<string, any[]> = {};
+    await Promise.all(topLevelComments.map(async (comment: any) => {
+      const replyResp: any = await request(
+        GITHUB_API_URL,
+        REPLIES_QUERY,
+        { commentId: comment.id },
+        {
+          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        }
+      );
+      const replies = replyResp.node?.replies?.nodes || [];
+      repliesMap[comment.id] = replies;
+    }));
+
+    // Flatten all comments and replies (1 level deep)
+    const comments = flattenCommentsWithReplies(topLevelComments, repliesMap);
+    
+    // Process comments to handle frontmatter and sort by creation date
+    const processedComments = comments.map((comment: any) => {
+      // Try to parse YAML frontmatter for anonymous comments
+      const { frontmatter: meta, content } = parseFrontmatter(comment.body);
+      const avatarUrl = meta.email && meta.email.trim()
+        ? `https://www.gravatar.com/avatar/${meta.email.toLowerCase().trim()}?d=mp&s=40`
+        : 'https://www.gravatar.com/avatar/?d=mp&s=40';
+      // Remove frontmatter block from bodyHTML if present (GitHub renders it as a <pre> or <code> block at the top)
+      let cleanBodyHTML = stripFrontmatterFromHtml(comment.bodyHTML);
+      return {
+        ...comment,
+        body: content, // markdown without frontmatter
+        bodyHTML: cleanBodyHTML, // GitHub-rendered HTML without frontmatter
+        author: {
+          login: meta.nickname || comment.author?.login || 'Anonymous',
+          avatarUrl
+        },
+        replyTo: comment.replyTo && comment.replyTo.id ? { id: comment.replyTo.id } : null
+      };
+    });
+
+    // Sort comments by creation date (oldest first)
+    return processedComments.sort((a: any, b: any) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to fetch comments: ${error.message}`);
+    }
+    throw new Error('Failed to fetch comments');
+  }
+}
+
+export async function addCommentToDiscussion(discussionId: string, body: string, replyToId?: string) {
+  try {
+    validateEnv();
+
+    const ADD_COMMENT_MUTATION = `
+      mutation AddComment($discussionId: ID!, $body: String!, $replyToId: ID) {
+        addDiscussionComment(input: { discussionId: $discussionId, body: $body, replyToId: $replyToId }) {
+          comment {
+            id
+            body
+            createdAt
+            author {
+              login
+              avatarUrl
+            }
+            replyTo {
+              id
+            }
+          }
+        }
+      }
+    `;
+
+    const variables: any = { discussionId, body };
+    if (replyToId) variables.replyToId = replyToId;
+
+    const response: any = await request(
+      GITHUB_API_URL,
+      ADD_COMMENT_MUTATION,
+      variables,
+      {
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      }
+    );
+
+    if (!response.addDiscussionComment?.comment) {
+      throw new Error('Failed to add comment');
+    }
+
+    return response.addDiscussionComment.comment;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to add comment: ${error.message}`);
+    }
+    throw new Error('Failed to add comment');
+  }
+} 

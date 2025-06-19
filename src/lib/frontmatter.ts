@@ -31,4 +31,14 @@ export function parseFrontmatter(content: string): { frontmatter: Frontmatter; c
   }
 
   return { frontmatter, content: markdownContent };
+}
+
+// Utility to strip frontmatter block from GitHub-rendered HTML
+export function stripFrontmatterFromHtml(html: string): string {
+  // Remove <pre>...</pre> or <code>...</code> or <p>...</p> at the very top if it matches the frontmatter
+  // This covers most cases for GitHub Discussions
+  let clean = html.replace(/^<pre>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/pre>\n?/i, '');
+  clean = clean.replace(/^<code>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/code>\n?/i, '');
+  clean = clean.replace(/^<p>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/p>\n?/i, '');
+  return clean;
 } 

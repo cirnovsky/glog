@@ -6,7 +6,6 @@ import { format } from 'date-fns';
 import { Category, Label as Tag } from '@/types/github';
 import { marked } from 'marked';
 import { useEffect } from 'react';
-// @ts-expect-error: prismjs has no types
 import Prism from 'prismjs';
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
@@ -26,6 +25,9 @@ import 'prismjs/components/prism-markdown';
 import katex from 'katex';
 import 'prismjs/plugins/toolbar/prism-toolbar';
 import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
+import CommentSection from './CommentSection';
+import { stripFrontmatterFromHtml } from '@/lib/frontmatter';
+import { processContentHtml } from './CommentSection';
 
 interface PostContentProps {
   post: any;
@@ -55,15 +57,29 @@ function renderMath(html: string): string {
 }
 
 export default function PostContent({ post }: PostContentProps) {
-  // Use post.title, post.body, post.createdAt, etc.
-  // Convert markdown to HTML
-  const html: string = marked(post.body) as string;
-  // Render math
-  const mathHtml = renderMath(html);
+  // Use raw markdown, process it the same as comments
+  const processedHtml = processContentHtml(post.body || '');
 
   useEffect(() => {
-    Prism.highlightAll();
-  }, [mathHtml]);
+    // Ensure Prism is loaded and highlight all code blocks
+    if (typeof Prism !== 'undefined') {
+      Prism.highlightAll();
+    } else {
+      console.warn('Prism.js not loaded');
+    }
+  }, [processedHtml]);
+
+  // Add a second effect to handle dynamic content
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (typeof Prism !== 'undefined') {
+        console.log('Re-highlighting code blocks after delay...');
+        Prism.highlightAll();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [processedHtml]);
 
   return (
     <div className="post-content-responsive">
@@ -92,7 +108,7 @@ export default function PostContent({ post }: PostContentProps) {
         </div>
         <div
           className="markdown-body"
-          dangerouslySetInnerHTML={{ __html: mathHtml }}
+          dangerouslySetInnerHTML={{ __html: processedHtml }}
         />
         <div style={{ marginTop: '2rem' }}>
           <Button as={Link} href="/posts" primary>
@@ -100,6 +116,12 @@ export default function PostContent({ post }: PostContentProps) {
           </Button>
         </div>
       </Segment>
+
+      {/* Comment Section */}
+      <CommentSection 
+        discussionId={post.id} 
+        discussionTitle={post.title}
+      />
     </div>
   );
 } 
