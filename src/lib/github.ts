@@ -7,12 +7,12 @@ const REPO_OWNER = process.env.GITHUB_REPO_OWNER || '';
 const REPO_NAME = process.env.GITHUB_REPO_NAME || '';
 
 // Log environment variables status on module load
-console.log('GitHub API Client - Environment check:', {
-  hasToken: !!process.env.GITHUB_TOKEN,
-  repoOwner: REPO_OWNER,
-  repoName: REPO_NAME,
-  apiUrl: GITHUB_API_URL,
-});
+// console.log('GitHub API Client - Environment check:', {
+//   hasToken: !!process.env.GITHUB_TOKEN,
+//   repoOwner: REPO_OWNER,
+//   repoName: REPO_NAME,
+//   apiUrl: GITHUB_API_URL,
+// });
 
 // Validate environment variables
 function validateEnv() {
@@ -137,6 +137,7 @@ export async function getDiscussions(params: SearchParams = {}): Promise<Discuss
         ...discussion,
         slug,
         body: content,
+        bodyHTML: stripFrontmatterFromHtml(discussion.bodyHTML),
         frontmatter,
         labels: {
           ...discussion.labels,
@@ -306,7 +307,12 @@ export async function getDiscussionBySlug(slug: string) {
   // Fetch a reasonable number of discussions (adjust as needed)
   const discussionsResponse = await getDiscussions({ first: 100 });
   const posts = discussionsResponse.repository?.discussions?.nodes || [];
-  return posts.find((post: any) => post.slug === slug);
+  const post = posts.find((post: any) => post.slug === slug);
+  if (!post) return undefined;
+  return {
+    ...post,
+    bodyHTML: stripFrontmatterFromHtml(post.bodyHTML),
+  };
 }
 
 export async function getAllDiscussions(params: SearchParams = {}): Promise<DiscussionsResponse> {
@@ -370,6 +376,7 @@ export async function getAllDiscussions(params: SearchParams = {}): Promise<Disc
         ...discussion,
         slug,
         body: content,
+        bodyHTML: stripFrontmatterFromHtml(discussion.bodyHTML),
         frontmatter,
         labels: {
           ...discussion.labels,

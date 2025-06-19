@@ -35,7 +35,7 @@ export default function PostCard({ title, excerpt, date, slug, category, tags }:
     <ClientOnly>
       <Card fluid>
         <Card.Content>
-          <Card.Header>
+          <Card.Header style={{ marginBottom: '0.5rem' }}>
             <Link href={`/posts/${slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
               {title}
             </Link>

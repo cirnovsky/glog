@@ -3,32 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Button, Form, Comment, Header, Segment, Input, TextArea, Icon } from 'semantic-ui-react';
 import LoadingSpinner from './LoadingSpinner';
-// @ts-expect-error: katex has no types
-import katex from 'katex';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-json';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-cpp';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-go';
-import 'prismjs/components/prism-rust';
-import 'prismjs/components/prism-diff';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/plugins/toolbar/prism-toolbar';
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
-import { stripFrontmatterFromHtml } from '@/lib/frontmatter';
-import { marked } from 'marked';
-import { parseFrontmatter } from '@/lib/frontmatter';
+import { processGithubBodyHTML } from '@/lib/content';
+import md5 from 'md5';
 
 interface CommentData {
   id: string;
-  body: string;
+  bodyHTML: string;
   author: {
     login: string;
     avatarUrl: string;
@@ -95,7 +75,7 @@ function CommentInput({
         <Form.Field>
           <Input
             type="email"
-            placeholder="Email (optional, for Gravatar)"
+            placeholder="Email (optional)"
             value={value.email}
             onChange={e => onChange('email', e.target.value)}
           />
@@ -132,51 +112,14 @@ function CommentInput({
   );
 }
 
-// Use the same renderMath as PostContent
-function renderMath(html: string): string {
-  // Render block math $$...$$ and inline math $...$
-  html = html.replace(/\$\$([\s\S]+?)\$\$/g, (match, expr) => {
-    try {
-      return katex.renderToString(expr, { displayMode: true });
-    } catch {
-      return match;
-    }
-  });
-  html = html.replace(/\$(.+?)\$/g, (match, expr) => {
-    if (expr.includes('<code>') || expr.includes('</code>')) return match;
-    try {
-      return katex.renderToString(expr, { displayMode: false });
-    } catch {
-      return match;
-    }
-  });
-  return html;
-}
-
-// Shared content processing for posts, comments, and replies
-export function processContentHtml(markdown: string): string {
-  // Strip frontmatter from markdown
-  const { content } = parseFrontmatter(markdown || '');
-  // Render to HTML
-  const html = marked(content) as string;
-  // Render math
-  return renderMath(html);
-}
-
-function CommentBody({ markdown }: { markdown: string }) {
+function CommentBody({ html }: { html: string }) {
   const htmlRef = useRef<HTMLDivElement>(null);
-  const processedHtml = processContentHtml(markdown);
-  useEffect(() => {
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
-    }
-  }, [processedHtml]);
   return (
     <div
       className="markdown-body comment-markdown-body"
       ref={htmlRef}
       style={{ paddingLeft: 0, marginLeft: 0 }}
-      dangerouslySetInnerHTML={{ __html: processedHtml }}
+      dangerouslySetInnerHTML={{ __html: processGithubBodyHTML(html) }}
     />
   );
 }
@@ -251,7 +194,7 @@ export default function CommentSection({ discussionId, discussionTitle }: Commen
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nickname: formData.nickname.trim(),
-          email: formData.email.trim(),
+          email: md5(formData.email.trim()),
           body: formData.body.trim(),
         }),
       });
@@ -282,7 +225,7 @@ export default function CommentSection({ discussionId, discussionTitle }: Commen
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nickname: replyForm.nickname.trim(),
-          email: replyForm.email.trim(),
+          email: md5(replyForm.email.trim()),
           body: replyForm.body.trim(),
           replyTo: parentId,
         }),
@@ -332,13 +275,6 @@ export default function CommentSection({ discussionId, discussionTitle }: Commen
     return roots;
   }
 
-  // Prism highlight after comments change
-  useEffect(() => {
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
-    }
-  }, [comments]);
-
   // Recursive render
   function renderCommentTree(nodes: any[]): JSX.Element[] {
     return nodes.map((comment) => (
@@ -366,12 +302,14 @@ export default function CommentSection({ discussionId, discussionTitle }: Commen
             />
           )}
           <Comment.Text>
-            <CommentBody markdown={comment.body} />
+            <CommentBody html={comment.bodyHTML} />
           </Comment.Text>
           <Comment.Actions>
-            <Comment.Action onClick={() => setReplyForm({ parentId: comment.id, nickname: '', email: '', body: '' })}>
-              <Icon name="reply" /> Reply
-            </Comment.Action>
+            {comment.replyTo == null && (
+              <Comment.Action onClick={() => setReplyForm({ parentId: comment.id, nickname: '', email: '', body: '' })}>
+                <Icon name="reply" /> Reply
+              </Comment.Action>
+            )}
           </Comment.Actions>
         </Comment.Content>
         {comment.children && comment.children.length > 0 && (

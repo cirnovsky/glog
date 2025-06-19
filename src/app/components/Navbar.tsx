@@ -7,17 +7,19 @@ import ClientOnly from './ClientOnly';
 export default function Navbar() {
   return (
     <ClientOnly>
-      <Menu fixed="top" inverted className='centered-fixed-menu'>
+      <Menu fixed="top" inverted className='centered-fixed-menu margin-top'>
         <Container>
           <Menu.Item as={Link} href="/" header>
-            GLog
+            Cirnovsky's Blog
           </Menu.Item>
-          <Menu.Item as={Link} href="/">
-            Home
-          </Menu.Item>
-          <Menu.Item as={Link} href="/posts">
-            Posts
-          </Menu.Item>
+          <Menu.Menu position="right">
+            <Menu.Item as={Link} href="/">
+              Home
+            </Menu.Item>
+            <Menu.Item as={Link} href="/posts">
+              Posts
+            </Menu.Item>
+          </Menu.Menu>
         </Container>
       </Menu>
     </ClientOnly>

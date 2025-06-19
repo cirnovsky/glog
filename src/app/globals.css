@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,30 +11,6 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
-  font-family: Palatino, 'Palatino Linotype', 'Palatino LT STD', 'Latin Modern Roman', 'Source Han Serif CN', serif;
-}
-
-body {
-  font-family: 'Source Han Serif CN', serif !important;
-}
-
-/* Ensure all headers and titles use the desired font */
-h1, h2, h3, h4, h5, h6,
-.ui.header,
-.ui.card .header,
-.ui.card .content .header,
-.ui.segment .header,
-.ui.segment h1,
-.ui.segment h2,
-.ui.segment h3,
-.ui.segment h4,
-.ui.segment h5,
-.ui.segment h6 {
-  font-family: 'Source Han Serif CN', serif !important;
-}
-
-blockquote {
-  font-family: 'Kai SC', 'Kai TC', serif !important;
 }
 
 .error-container {
@@ -79,15 +56,15 @@ img:hover {
 }
 
 .markdown-body {
-  max-width: 640px;
-  margin: 2.5rem auto;
-  font-size: 1.25rem;
   line-height: 1.8;
-  font-family: 'georgia', 'times new roman', times, serif;
+  font-size: 1.25rem;
+  font-family: 'Times New Roman', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Times, serif;
+  /* max-width: 640px;
+  margin: 2.5rem auto;
   background: #fff;
   padding: 2.5rem 2rem;
   border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06); */
 }
 
 .ui.segment {
@@ -101,37 +78,11 @@ img:hover {
   /* text-align: center; */
 }
 
-@font-face {
-  font-family: 'source han serif cn';
-  src: local('source han serif cn'), local('source han serif sc'),
-       local('source han serif tc'), local('source han serif tw'),
-       local('source han serif'), local('noto serif cjk sc'), local('songti sc'), local('simsong'),
-       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/sourcehanserifcn-regular-yihui.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'kai sc';
-  src: local('kaiti'), local('kaiti sc'), local('stkaiti'), local('楷体'), local('simkai'), local('ar pl kaitiM GB'), local('DFKai-SB'), local('FandolKai'),
-       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/gkai00mp-yihui.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Kai TC';
-  src: url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/bkai00mp-yihui.woff2') format('woff2');
-}
-
-.home blockquote, .cn blockquote, .kai, .cn em, .cn .side, .hash-note, .hide-notes .toggle-notes {
-  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Kai SC', 'Kai TC', serif;
-}
-code {
-  font-family: Consolas, Courier, 'Lucida Console', 'Courier New', 'Kai SC', 'Kai TC', monospace;
-}
 pre, code {
   font-size: .95em;
 }
 .cn em, .cn .title {
   font-style: normal;
-}
-blockquote {
-  font-family: 'Kai SC', 'Kai TC', serif;
 }
 
 /* Reduce the search bar button and fields size */
@@ -172,14 +123,23 @@ blockquote {
   }
 }
 
+.page-segment-wrapper {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
 .centered-fixed-menu {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: 50vw !important;
-  max-width: 700px !important;
-  min-width: 320px;
-  margin: 0 auto !important;
+  /* width: 50vw !important; */
+  /* max-width: 700px !important; */
+  /* min-width: 320px; */
+  margin-top: 1rem !important;
   border-radius: 12px !important;
+  background: #f3f4f6 !important; /* light gray */
+  color: #222 !important;
 }
 
 @media (max-width: 900px) {
@@ -248,6 +208,7 @@ blockquote {
 
 .ui.menu.fixed.top.inverted.centered-fixed-menu .item {
   border-radius: 0 !important;
+  color: #222 !important;
 }
 
 @media (max-width: 900px) {
@@ -454,181 +415,75 @@ blockquote {
   box-sizing: border-box;
 }
 
-/* Prism.js syntax highlighting styles - Light Theme */
+/* Elegant Prism code block and inline code styling */
+
 pre[class*="language-"],
 code[class*="language-"] {
-  color: #333;
-  font-size: 13px;
-  text-shadow: none;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  direction: ltr;
-  text-align: left;
-  white-space: pre;
-  word-spacing: normal;
-  word-break: normal;
-  line-height: 1.5;
-  -moz-tab-size: 4;
-  -o-tab-size: 4;
-  tab-size: 4;
-  -webkit-hyphens: none;
-  -moz-hyphens: none;
-  -ms-hyphens: none;
-  hyphens: none;
-  text-decoration: none !important;
-}
-
-/* Remove any text decoration from all code elements */
-code,
-pre,
-pre code,
-code[class*="language-"],
-pre[class*="language-"],
-pre[class*="language-"] code,
-:not(pre) > code[class*="language-"] {
-  text-decoration: none !important;
-  text-decoration-line: none !important;
-  text-decoration-style: none !important;
-  text-decoration-color: transparent !important;
-}
-
-/* Remove text decoration from tokens */
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata,
-.token.punctuation,
-.token.namespace,
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted,
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted,
-.token.operator,
-.token.entity,
-.token.url,
-.token.atrule,
-.token.attr-value,
-.token.keyword,
-.token.function,
-.token.regex,
-.token.important,
-.token.variable,
-.token.italic,
-.token.entity {
-  text-decoration: none !important;
-  text-decoration-line: none !important;
-  text-decoration-style: none !important;
-  text-decoration-color: transparent !important;
-}
-
-pre[class*="language-"]::selection,
-code[class*="language-"]::selection,
-pre[class*="language-"] *::selection,
-code[class*="language-"] *::selection {
-  text-shadow: none;
-  background: #b3d4fc;
-  text-decoration: none !important;
-}
-
-@media print {
-  pre[class*="language-"],
-  code[class*="language-"] {
-    text-shadow: none;
-  }
-}
-
-pre[class*="language-"] {
-  padding: 1em;
-  margin: .5em 0;
-  overflow: auto;
-  /* background: #f5f5f5; */
-  /* border: 1px solid #e1e4e8; */
-  border-radius: 8px;
-}
-
-:not(pre) > code[class*="language-"] {
-  padding: .2em .3em;
-  border-radius: .3em;
-  color: #e36209;
+  font-family: 'Source Code Pro', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 1em;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  margin: 1.5em 0;
+  padding: 1.2em;
   background: #f6f8fa;
+  color: #333;
+  overflow-x: auto;
+  transition: box-shadow 0.2s;
+  line-height: 1.6;
+}
+pre[class*="language-"]:hover {
+  box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+}
+code[class*="language-"] {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
 }
 
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  padding: 0.2em 0.4em;
+  color: #e36209;
+  font-size: 0.95em;
+}
+
+/* Remove text decoration from all code elements */
+code, pre, pre code, code[class*="language-"], pre[class*="language-"], pre[class*="language-"] code, :not(pre) > code[class*="language-"] {
+  text-decoration: none !important;
+}
+
+/* Token colors for better readability */
+.token.comment, .token.prolog, .token.doctype, .token.cdata {
   color: #6a737d;
 }
-
 .token.punctuation {
   color: #333;
 }
-
-.token.namespace {
-  opacity: .7;
-}
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted {
+.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
   color: #22863a;
 }
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted {
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
   color: #032f62;
 }
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-  color: #333;
-  background: #f5f5f5;
-}
-
-.token.atrule,
-.token.attr-value,
-.token.keyword {
+.token.atrule, .token.attr-value, .token.keyword {
   color: #d73a49;
 }
-
 .token.function {
   color: #6f42c1;
 }
-
-.token.regex,
-.token.important,
-.token.variable {
+.token.regex, .token.important, .token.variable {
   color: #e36209;
 }
-
-.token.important,
-.token.bold {
+.token.important, .token.bold {
   font-weight: bold;
 }
-
 .token.italic {
   font-style: italic;
 }
-
 .token.entity {
   cursor: help;
 }
@@ -693,4 +548,52 @@ pre[class*="language-"] {
   background: none !important;
   border: none !important;
   color: inherit !important;
+}
+
+
+/* 3. Code blocks, inline code, and tags */
+pre, code, .tag {
+  font-family: 'Source Code Pro', 'Fira Mono', 'Consolas', monospace !important;
+}
+
+/* 4. Tags in post cards (Semantic UI Label) */
+/* .ui.label {
+  font-family: 'Source Code Pro', 'Fira Mono', 'Consolas', monospace !important;
+} */
+
+.header,
+.content,
+.ui.container,
+.ui.segment,
+.ui.header {
+  font-family: 'Times New Roman', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Times, serif !important;
+}
+
+.centered-fixed-menu .item:hover {
+  color: #2563eb !important; /* blue-600 accent */
+  background: #e5e7eb !important; /* subtle gray background on hover */
+  transition: color 0.2s, background 0.2s;
+}
+
+.centered-fixed-menu,
+.ui.pagination.menu,
+.ui.card,
+.post-content-responsive {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.markdown-body ol {
+  list-style-type: decimal !important;
+  margin-left: 2em;
+}
+.markdown-body ul {
+  list-style-type: disc !important;
+  margin-left: 2em;
+}
+.markdown-body li {
+  display: list-item !important;
 }

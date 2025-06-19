@@ -5,9 +5,8 @@ import Link from 'next/link';
 
 export default function HomeContent() {
   return (
-    <>
-      <Header as="h1">Welcome to My Blog</Header>
-      <Segment>
+    <div className="markdown-body">
+      {/* <Segment> */}
         <Header as="h2">About Me</Header>
         <p>
         一条川渝混血咸鱼。不吃辣。摇滚热，V 家粉，不通音律。乒乓迷，底板碳素 190，双面反胶，正手省狂，反手白金，直横混打。半吊子足球运动员，因膝部伤病引退。
@@ -20,13 +19,13 @@ export default function HomeContent() {
           Feel free to explore my posts, and don't hesitate to reach out if you have any questions
           or would like to discuss any topics.
         </p>
-      </Segment>
-      <Segment>
+      {/* </Segment> */}
+      {/* <Segment> */}
         <Header as="h2">Latest Posts</Header>
         <p>
           Check out my latest posts in the <a href="/posts">posts section</a>.
         </p>
-      </Segment>
-    </>
+      {/* </Segment> */}
+    </div>
   );
 } 
