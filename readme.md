@@ -1,5 +1,5 @@
 # TODO
 
-- [] Image reindex;
-- [] Search bar;
-- [] Add bottom margin;
+- [ ] Image reindex;
+- [ ] Search bar;
+- [ ] Add bottom margin;
