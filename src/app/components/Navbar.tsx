@@ -19,6 +19,9 @@ export default function Navbar() {
             <Menu.Item as={Link} href="/posts">
               Posts
             </Menu.Item>
+            <Menu.Item as={Link} href="/one">
+              每日一文
+            </Menu.Item>
           </Menu.Menu>
         </Container>
       </Menu>
