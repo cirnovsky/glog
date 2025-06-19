@@ -61,9 +61,9 @@ export function stripFrontmatterFromHtml(html: string): string {
   let clean = html.replace(/^<pre>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/pre>\n?/i, '');
   clean = clean.replace(/^<code>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/code>\n?/i, '');
   clean = clean.replace(/^<p>[\s\S]*?---[\s\S]*?---[\s\S]*?<\/p>\n?/i, '');
-  // Remove <h2>...</h2> if it looks like frontmatter (lines with key: value)
+  // Remove <hr>\n<h2 dir="auto">...</h2> at the top (no 's' flag)
   clean = clean.replace(
-    /<h2 dir="auto">([\s\S]*?)<\/h2>/g,
+    /<hr>\n<h2 dir="auto">([\s\S]*?)<\/h2>/,
     ''
   );
   return clean;
