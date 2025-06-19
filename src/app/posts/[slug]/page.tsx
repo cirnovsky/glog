@@ -1,47 +1,19 @@
-import { notFound } from 'next/navigation';
-import { getDiscussions } from '@/lib/github';
-import PostContent from '../../components/PostContent';
-import { Discussion } from '@/types/github';
+"use client";
 
-interface PostPageProps {
-  params: {
-    slug: string;
-  };
-}
+import useSWR from "swr";
+import { useParams } from "next/navigation";
+import PostContent from "../../components/PostContent";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
-export default async function PostPage({ params }: PostPageProps) {
-  try {
-    const response = await getDiscussions();
-    const post = response.repository.discussions.nodes.find(
-      (p: Discussion) => p.slug === params.slug
-    );
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-    if (!post) {
-      notFound();
-    }
+export default function PostPage() {
+  const { slug } = useParams();
+  const { data, error, isLoading } = useSWR(slug ? `/api/post/${slug}` : null, fetcher);
 
-    return (
-      <div className="ui container" style={{ marginTop: '2rem' }}>
-        <PostContent
-          title={post.title}
-          content={post.body}
-          date={post.createdAt}
-          author={post.author.login}
-          category={post.category}
-          tags={post.labels.nodes}
-          slug={post.slug}
-        />
-      </div>
-    );
-  } catch (error) {
-    console.error('Error loading post:', error);
-    return (
-      <div className="ui container" style={{ marginTop: '2rem' }}>
-        <div className="ui negative message">
-          <div className="header">Error</div>
-          <p>Failed to load the post. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingSpinner text="Loading post..." />;
+  if (error) return <div>Error loading post: {error.message}</div>;
+  if (!data) return <div>Post not found</div>;
+
+  return <PostContent post={data} />;
 } 

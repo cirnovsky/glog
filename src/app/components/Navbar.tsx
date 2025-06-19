@@ -7,7 +7,7 @@ import ClientOnly from './ClientOnly';
 export default function Navbar() {
   return (
     <ClientOnly>
-      <Menu fixed="top" inverted>
+      <Menu fixed="top" inverted className='centered-fixed-menu'>
         <Container>
           <Menu.Item as={Link} href="/" header>
             GLog

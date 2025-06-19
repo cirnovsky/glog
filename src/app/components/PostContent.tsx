@@ -28,13 +28,7 @@ import 'prismjs/plugins/toolbar/prism-toolbar';
 import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard';
 
 interface PostContentProps {
-  title: string;
-  content: string;
-  date: string;
-  author: string;
-  category: Category;
-  tags: Tag[];
-  slug: string;
+  post: any;
 }
 
 function renderMath(html: string): string {
@@ -60,9 +54,10 @@ function renderMath(html: string): string {
   return html;
 }
 
-export default function PostContent({ title, content, date, author, category, tags, slug }: PostContentProps) {
+export default function PostContent({ post }: PostContentProps) {
+  // Use post.title, post.body, post.createdAt, etc.
   // Convert markdown to HTML
-  const html: string = marked(content) as string;
+  const html: string = marked(post.body) as string;
   // Render math
   const mathHtml = renderMath(html);
 
@@ -71,38 +66,40 @@ export default function PostContent({ title, content, date, author, category, ta
   }, [mathHtml]);
 
   return (
-    <Segment>
-      <Header as="h1">{title}</Header>
-      <div style={{ color: 'rgba(0,0,0,.6)', marginBottom: '1rem' }}>
-        By {author} on {format(new Date(date), 'MMMM d, yyyy')}
-      </div>
-      <div style={{ marginBottom: '1rem' }}>
-        <Label color="blue" size="large">
-          {category.name}
-        </Label>
-        {tags.map((tag) => (
-          <Label
-            key={tag.id}
-            size="large"
-            style={{
-              backgroundColor: `#${tag.color}`,
-              color: parseInt(tag.color, 16) > 0x7fffff ? '#000' : '#fff',
-              marginLeft: '0.5rem',
-            }}
-          >
-            {tag.name}
+    <div className="post-content-responsive">
+      <Segment>
+        <Header as="h1">{post.title}</Header>
+        <div style={{ color: 'rgba(0,0,0,.6)', marginBottom: '1rem' }}>
+          By {post.author?.login} on {format(new Date(post.createdAt), 'MMMM d, yyyy')}
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <Label color="blue" size="large">
+            {post.category.name}
           </Label>
-        ))}
-      </div>
-      <div
-        className="markdown-body"
-        dangerouslySetInnerHTML={{ __html: mathHtml }}
-      />
-      <div style={{ marginTop: '2rem' }}>
-        <Button as={Link} href="/posts" primary>
-          Back to Posts
-        </Button>
-      </div>
-    </Segment>
+          {post.labels?.nodes?.map((tag: any) => (
+            <Label
+              key={tag.id}
+              size="large"
+              style={{
+                backgroundColor: `#${tag.color}`,
+                color: parseInt(tag.color, 16) > 0x7fffff ? '#000' : '#fff',
+                marginLeft: '0.5rem',
+              }}
+            >
+              {tag.name}
+            </Label>
+          ))}
+        </div>
+        <div
+          className="markdown-body"
+          dangerouslySetInnerHTML={{ __html: mathHtml }}
+        />
+        <div style={{ marginTop: '2rem' }}>
+          <Button as={Link} href="/posts" primary>
+            Back to Posts
+          </Button>
+        </div>
+      </Segment>
+    </div>
   );
 } 

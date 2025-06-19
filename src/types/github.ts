@@ -45,7 +45,7 @@ export interface DiscussionsResponse {
       nodes: Discussion[];
       pageInfo: {
         hasNextPage: boolean;
-        endCursor: string;
+        endCursor: string | null;
       };
       totalCount: number;
     };

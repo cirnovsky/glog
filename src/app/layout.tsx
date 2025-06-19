@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        <div style={{ paddingTop: '70px', minHeight: '100vh' }}>
-          <div className="ui container">
+        <div className="post-content-responsive">
+          <Navbar />
+          <div style={{ paddingTop: '70px', minHeight: '100vh', width: '100%' }}>
             {children}
           </div>
         </div>

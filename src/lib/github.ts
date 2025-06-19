@@ -300,4 +300,172 @@ export async function deleteDiscussion(discussionId: string): Promise<void> {
     }
     throw new Error('Failed to delete discussion');
   }
-} 
+}
+
+export async function getDiscussionBySlug(slug: string) {
+  // Fetch a reasonable number of discussions (adjust as needed)
+  const discussionsResponse = await getDiscussions({ first: 100 });
+  const posts = discussionsResponse.repository?.discussions?.nodes || [];
+  return posts.find((post: any) => post.slug === slug);
+}
+
+export async function getAllDiscussions(params: SearchParams = {}): Promise<DiscussionsResponse> {
+  try {
+    validateEnv();
+
+    let allNodes: any[] = [];
+    let hasNextPage = true;
+    let endCursor: string | null = null;
+    const batchSize = 100; // GitHub's maximum
+
+    while (hasNextPage) {
+      const variables: any = {
+        owner: REPO_OWNER,
+        name: REPO_NAME,
+        first: batchSize,
+        categoryId: params.category,
+        after: endCursor,
+      };
+
+      const response: any = await request<DiscussionsResponse>(
+        GITHUB_API_URL,
+        DISCUSSION_QUERY_WITH_CURSORS,
+        variables,
+        {
+          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        }
+      );
+
+      if (!response.repository) {
+        throw new Error(`Repository not found: ${REPO_OWNER}/${REPO_NAME}`);
+      }
+
+      const discussions: any = response.repository.discussions;
+      allNodes = allNodes.concat(discussions.nodes);
+
+      // Check if there are more pages
+      hasNextPage = discussions.pageInfo?.hasNextPage || false;
+      endCursor = discussions.pageInfo?.endCursor || null;
+
+      // Safety check to prevent infinite loops
+      if (allNodes.length > 1000) {
+        console.warn('Reached safety limit of 1000 posts, stopping pagination');
+        break;
+      }
+    }
+
+    // Process frontmatter for all discussions
+    allNodes = allNodes.map(discussion => {
+      const { frontmatter, content } = parseFrontmatter(discussion.body);
+      
+      // Use frontmatter slug if available, otherwise use discussion ID
+      const slug = frontmatter.slug || discussion.id;
+      
+      // Combine frontmatter tags with discussion labels
+      const tags = frontmatter.tags || [];
+      const existingLabels = discussion.labels.nodes.map((label: any) => label.name);
+      const allTags = Array.from(new Set([...tags, ...existingLabels]));
+      
+      return {
+        ...discussion,
+        slug,
+        body: content,
+        frontmatter,
+        labels: {
+          ...discussion.labels,
+          nodes: allTags.map(tag => ({
+            id: tag,
+            name: tag,
+            color: '000000', // Default color for frontmatter tags
+          })),
+        },
+      };
+    });
+
+    // Filter discussions by label/tag if specified
+    if (params.tag) {
+      allNodes = allNodes.filter(
+        discussion => discussion.labels.nodes.some((label: any) => label.name === params.tag)
+      );
+    }
+
+    return {
+      repository: {
+        discussions: {
+          nodes: allNodes,
+          totalCount: allNodes.length,
+          pageInfo: {
+            hasNextPage: false,
+            endCursor: null as string | null,
+          }
+        }
+      }
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes('401')) {
+        throw new Error('GitHub authentication failed. Please check your token.');
+      }
+      if (error.message.includes('404')) {
+        throw new Error(`Repository not found: ${REPO_OWNER}/${REPO_NAME}`);
+      }
+      if (error.message.includes('403')) {
+        throw new Error('Access denied. Please check your token permissions.');
+      }
+      throw new Error(`Failed to fetch discussions: ${error.message}`);
+    }
+    throw new Error('Failed to fetch discussions');
+  }
+}
+
+const DISCUSSION_QUERY_WITH_CURSORS = `
+  query GetDiscussions(
+    $owner: String!
+    $name: String!
+    $first: Int!
+    $categoryId: ID
+    $after: String
+  ) {
+    repository(owner: $owner, name: $name) {
+      discussions(
+        first: $first
+        categoryId: $categoryId
+        after: $after
+        orderBy: { field: CREATED_AT, direction: DESC }
+      ) {
+        nodes {
+          id
+          title
+          body
+          bodyHTML
+          createdAt
+          updatedAt
+          author {
+            login
+            avatarUrl
+          }
+          category {
+            id
+            name
+            description
+          }
+          labels(first: 10) {
+            nodes {
+              id
+              name
+              color
+            }
+          }
+          comments {
+            totalCount
+          }
+        }
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+`; 
