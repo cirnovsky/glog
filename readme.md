@@ -5,4 +5,5 @@
 - [ ] Add bottom margin
 - [ ] Add abuse protection;
 - [ ] Font size 18pt. Georgia;
-- [ ] Obliterate pagination.
+- [ ] Obliterate pagination;
+- [ ] Dark mode.
