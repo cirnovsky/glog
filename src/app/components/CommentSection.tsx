@@ -327,7 +327,7 @@ export default function CommentSection({ discussionId, discussionTitle }: Commen
   }
 
   return (
-    <div ref={sectionRef} style={{ marginTop: '2rem' }}>
+    <div ref={sectionRef} style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <Segment>
         <Header as="h3">Comments</Header>
         <CommentInput

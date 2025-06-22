@@ -1,7 +1,70 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
+/* @import url('https://fonts.cdnfonts.com/css/georgia'); */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.header.container,
+.ui.header,
+.item,
+header,
+.header,
+.content,
+.ui.container,
+.ui.segment,
+.ui.header,
+.markdown-body {
+  font-family: Georgia, 'Times New Roman', Times, sans-serif, 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Times, serif !important;
+} */
+
+@font-face {
+  font-family: 'Source Han Serif CN';
+  src: local('Source Han Serif CN'), local('Source Han Serif SC'),
+       local('Source Han Serif TC'), local('Source Han Serif TW'),
+       local('Source Han Serif'), local('Noto Serif CJK SC'), local('Songti SC'), local('SimSong'),
+       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/SourceHanSerifCN-Regular-yihui.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Kai SC';
+  src: local('Kaiti'), local('Kaiti SC'), local('STKaiti'), local('楷体'), local('SimKai'), local('AR PL KaitiM GB'), local('DFKai-SB'), local('FandolKai'),
+       url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/gkai00mp-yihui.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Kai TC';
+  src: url('https://cdn.jsdelivr.net/gh/yihui/cron/fonts/bkai00mp-yihui.woff2') format('woff2');
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.header.container,
+.ui.header,
+.item,
+header,
+.header,
+.content,
+.ui.container,
+.ui.segment,
+.ui.header,
+.markdown-body
+body {
+  font-family: Palatino, 'Palatino Linotype', 'Palatino LT STD', 'Latin Modern Roman', 'Source Han Serif CN', serif !important;
+}
+.home blockquote, .cn blockquote, .kai, .cn em, .cn .side, .hash-note, .hide-notes .toggle-notes {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Kai SC', 'Kai TC', serif !important;
+}
+
+.markdown-body {
+  font-size: 1.25rem;
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -57,14 +120,9 @@ img:hover {
 
 .markdown-body {
   line-height: 1.8;
-  font-size: 1.25rem;
-  font-family: 'Times New Roman', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Times, serif;
-  /* max-width: 640px;
-  margin: 2.5rem auto;
-  background: #fff;
-  padding: 2.5rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06); */
+  /* max-width: 640px; */
+  margin-left: 2.5rem auto;
+  margin-right: 2.5rem auto;
 }
 
 .ui.segment {
@@ -104,7 +162,7 @@ pre, code {
   max-width: 700px;
   min-width: 320px;
   padding: 0 1rem;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -133,13 +191,13 @@ pre, code {
   margin-right: 0 !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  /* width: 50vw !important; */
-  /* max-width: 700px !important; */
-  /* min-width: 320px; */
   margin-top: 1rem !important;
-  border-radius: 12px !important;
-  background: #f3f4f6 !important; /* light gray */
+  background: none !important;
   color: #222 !important;
+}
+
+.centered-fixed-menu .item:hover {
+  transform: translateY(1px);
 }
 
 @media (max-width: 900px) {
@@ -163,10 +221,26 @@ pre, code {
 
 /* Ensure consistent alignment for all content containers */
 .ui.segment,
-.markdown-body,
 .ui.card {
   width: 100% !important;
   box-sizing: border-box !important;
+}
+
+.markdown-body {
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+}
+
+.markdown-body a {
+  text-decoration: underline dashed #666 !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 2px !important;
+  color: inherit !important;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.markdown-body a:hover {
+  transform: translateY(1px);
 }
 
 /* Override Semantic UI border radius */
@@ -556,23 +630,8 @@ pre, code, .tag {
   font-family: 'Source Code Pro', 'Fira Mono', 'Consolas', monospace !important;
 }
 
-/* 4. Tags in post cards (Semantic UI Label) */
-/* .ui.label {
-  font-family: 'Source Code Pro', 'Fira Mono', 'Consolas', monospace !important;
-} */
-
-.header,
-.content,
-.ui.container,
-.ui.segment,
-.ui.header {
-  font-family: 'Times New Roman', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Times, serif !important;
-}
-
 .centered-fixed-menu .item:hover {
-  color: #2563eb !important; /* blue-600 accent */
-  background: #e5e7eb !important; /* subtle gray background on hover */
-  transition: color 0.2s, background 0.2s;
+  transform: translateY(1px);
 }
 
 .centered-fixed-menu,
@@ -596,4 +655,81 @@ pre, code, .tag {
 }
 .markdown-body li {
   display: list-item !important;
+}
+
+/* Posts table styling - Yihui style */
+.posts-table {
+  max-width: 100%;
+}
+
+.year-section {
+  margin-bottom: 2rem;
+}
+
+.year-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.posts-list {
+  margin-left: 1rem;
+}
+
+.post-item {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.post-date {
+  color: #666;
+  font-size: 0.9rem;
+  font-family: 'Source Code Pro', monospace;
+  min-width: 100px;
+  margin-right: 1rem;
+}
+
+.post-title {
+  color: #333;
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.post-title:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+/* Remove old table styling */
+.ui.very.basic.table {
+  border: none;
+  box-shadow: none;
+}
+
+.ui.very.basic.table thead th {
+  background: none;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  padding: 1rem 0;
+}
+
+.ui.very.basic.table tbody td {
+  border: none;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.ui.very.basic.table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.ui.very.basic.table tbody tr:last-child td {
+  border-bottom: none;
 }

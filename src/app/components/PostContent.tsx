@@ -37,6 +37,9 @@ export default function PostContent({ post }: PostContentProps) {
         ))}
       </div>
       <div
+      style={{
+        marginTop: '2rem'
+      }}
         className="markdown-body"
         dangerouslySetInnerHTML={{ __html: processed }}
       />
